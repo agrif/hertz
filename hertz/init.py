@@ -3,6 +3,7 @@ import os.path
 import shutil
 import time
 from .command import Command
+from .project import Project
 
 skeletons = {}
 
@@ -86,9 +87,12 @@ class Init(Command):
         # copy in some files
         self.copy_in('gitignore', '.gitignore')
         self.copy_in('default.qpf')
-        self.copy_in('default.v')
+        verilog = self.copy_in('default.v')
         for fname in self.skel['files']:
             self.copy_in(fname)
+
+        proj = Project(self.outpath)
+        proj.add_source(verilog)
 
     def copy_in(self, src, dest=None, interpolate=True):
         fullsrc = os.path.join(self.skelpath, src)
@@ -104,3 +108,4 @@ class Init(Command):
         with open(fullsrc) as fs:
             with open(fulldest, 'w') as fd:
                 fd.write(fs.read().format(**self.data))
+        return fulldest

@@ -1,5 +1,6 @@
 import argparse
 import sys
+from . import project
 
 parser = argparse.ArgumentParser(prog='hz')
 subparsers = parser.add_subparsers(metavar='COMMAND', dest='subcommand')
@@ -35,7 +36,10 @@ class CommandMetaclass(type):
         super().__init__(name, bases, classdict)
 
 class Command(metaclass=CommandMetaclass, add=False):
-    def run(self, args):
+    def __init__(self, args):
+        self.run(args)
+    
+    def run(self, args, *a, **k):
         raise NotImplementedError(self.name)
 
     @classmethod
@@ -43,3 +47,7 @@ class Command(metaclass=CommandMetaclass, add=False):
         print('hz {}:'.format(cls.name), s, file=sys.stderr)
         sys.exit(1)
 
+class ProjectCommand(Command, add=False):
+    def __init__(self, args):
+        proj = project.find_project()
+        self.run(proj, args)

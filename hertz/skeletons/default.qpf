@@ -1,0 +1,9 @@
+# The below text was generated automatically by hertz
+# using the {skeleton_name} skeleton.
+
+DATE = "{quartus_date}"
+QUARTUS_VERSION = "14.0"
+
+# Revisions
+
+PROJECT_REVISION = "{project_name}"

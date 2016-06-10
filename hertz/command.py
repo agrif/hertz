@@ -1,5 +1,6 @@
 import argparse
 import sys
+import time
 from . import project
 
 parser = argparse.ArgumentParser(prog='hz')
@@ -51,3 +52,13 @@ class ProjectCommand(Command, add=False):
     def __init__(self, args):
         proj = project.find_project()
         self.run(proj, args)
+
+def recurse(*argv):
+    args = parser.parse_args(argv)
+    Cmd = subcommands[args.subcommand]
+
+    start = time.time()
+    Cmd(args)
+    end = time.time()
+    duration = end - start
+    print('hz {} completed in {:.02f}s'.format(args.subcommand, duration))

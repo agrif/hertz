@@ -77,12 +77,16 @@ class Project:
 
         self.qpf = self.find_file('qpf')
         self.qsf = self.find_file('qsf')
+        self.name, _ = os.path.splitext(self.qpf)
+
+    def file(self, path):
+        return os.path.join(self.path, path)
 
     def find_file(self, ext):
         fext = '.' + ext
         for fname in os.listdir(self.path):
             if fname.endswith(fext):
-                return os.path.join(self.path, fname)
+                return self.file(fname)
         else:
             raise RuntimeError('could not find {} file'.format(ext.upper()))
 

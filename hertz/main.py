@@ -1,6 +1,6 @@
 import subprocess
 import sys
-from . import command, init, source, build
+from . import command, init, source, build, program
 
 if __name__ == "__main__":    
     args = command.parser.parse_args()

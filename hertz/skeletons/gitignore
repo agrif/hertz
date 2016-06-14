@@ -1,17 +1,30 @@
 # The below text was generated automatically by hertz
 # using the {skeleton_name} skeleton.
 
+# these might cause you problems...
+*.html
+Makefile
+
 # quartus database
 /db/
 /incremental_db/
 
 # reports, suppressed messages, and summaries
-/{project_name}.*.rpt
-/{project_name}.*.smsg
-/{project_name}.*.summary
+*.rpt
+*.smsg
+*.summary
+*.cmp
+.qsys_edit/
 
 # built stuff
 /{project_name}.jdi
 /{project_name}.sof
 /{project_name}.pof
 /{project_name}.pin
+*.gen_qsys/
+*.gen_bsp/
+*.sopcinfo
+*.elf
+*.map
+*.objdump
+obj/

@@ -64,7 +64,8 @@ def find_project(path=None):
                 return Project(path)
         newpath = os.path.dirname(path)
         if path == newpath:
-            raise RuntimeError('not in a Quartus project directory')
+            # we hit root
+            return None
         path = newpath
 
 class Project:
@@ -141,6 +142,10 @@ class Project:
         ext = ext.lower()
         if ext == '.v':
             return 'set_global_assignment -name VERILOG_FILE ' + relpath
+        elif ext == '.qip':
+            return 'set_global_assignment -name QIP_FILE ' + relpath
+        elif ext == '.sdc':
+            return 'set_global_assignment -name SDC_FILE ' + relpath
         else:
             raise RuntimeError('unknown source type: {}'.format(repr(ext)))
     

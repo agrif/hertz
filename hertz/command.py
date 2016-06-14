@@ -1,7 +1,8 @@
 import argparse
 import sys
 import time
-from . import project
+import shlex
+from . import project, settings
 
 parser = argparse.ArgumentParser(prog='hz')
 subparsers = parser.add_subparsers(metavar='COMMAND', dest='subcommand')
@@ -27,9 +28,11 @@ class CommandMetaclass(type):
 
     def __new__(self, name, bases, classdict, add=True):
         global subcommands
+        if add:
+            p = subparsers.add_parser(classdict['name'], parents=[classdict['parser']], help=classdict['help'], aliases=classdict['aliases'])
+            classdict['parser'] = p
         cls = super().__new__(self, name, bases, classdict)
         if add:
-            subparsers.add_parser(classdict['name'], parents=[classdict['parser']], help=classdict['help'], aliases=classdict['aliases'])
             subcommands[classdict['name']] = cls
         return cls
 
@@ -37,10 +40,13 @@ class CommandMetaclass(type):
         super().__init__(name, bases, classdict)
 
 class Command(metaclass=CommandMetaclass, add=False):
-    def __init__(self, args):
-        self.run(args)
+    def __init__(self, proj, args, conf):
+        self.conf = conf
+        self.args = args
+        self.proj = proj
+        self.run(proj, args)
     
-    def run(self, args, *a, **k):
+    def run(self, proj, args):
         raise NotImplementedError(self.name)
 
     @classmethod
@@ -49,16 +55,27 @@ class Command(metaclass=CommandMetaclass, add=False):
         sys.exit(1)
 
 class ProjectCommand(Command, add=False):
-    def __init__(self, args):
-        proj = project.find_project()
-        self.run(proj, args)
+    def __init__(self, proj, args, conf):
+        if not proj:
+            raise RuntimeError('no project found')
+        super().__init__(proj, args, conf)
 
 def recurse(*argv):
     args = parser.parse_args(argv)
+
+    proj = project.find_project()
+    conf = settings.find_settings()
+
     Cmd = subcommands[args.subcommand]
+    cmdconf = conf.get(args.subcommand, {})
+    extra_argv = shlex.split(cmdconf.get('defaults', ''))
+    extra_argv += list(argv)
+    extra_argv.remove(args.subcommand)
+    extra_argv.insert(0, args.subcommand)
+    args = parser.parse_args(extra_argv)
 
     start = time.time()
-    Cmd(args)
+    Cmd(proj, args, cmdconf)
     end = time.time()
     duration = end - start
     print('hz {} completed in {:.02f}s'.format(args.subcommand, duration))

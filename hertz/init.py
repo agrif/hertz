@@ -27,7 +27,7 @@ def entityfy(s):
 class ListSkeletons(Command):
     help = 'list the available project skeletons'
 
-    def run(self, args):
+    def run(self, proj, args):
         skels = sorted(skeletons.keys())
         for skel in skels:
             d = skeletons[skel]
@@ -42,7 +42,7 @@ class Init(Command):
     parser.add_argument('--toplevel', help='toplevel entity', default=None)
     parser.add_argument('-f', '--force', action='store_true', default=False, help='create skeleton even if not empty')
 
-    def run(self, args):
+    def run(self, proj, args):
         # make sure we can read skeleton data
         self.skelpath = os.path.join(os.path.dirname(__file__), 'skeletons')
         if not os.path.isfile(os.path.join(self.skelpath, 'gitignore')):
@@ -86,6 +86,7 @@ class Init(Command):
 
         # copy in some files
         self.copy_in('gitignore', '.gitignore')
+        self.copy_in('hertz', '.hertz')
         self.copy_in('default.qpf')
         verilog = self.copy_in('default.v')
         for fname in self.skel['files']:

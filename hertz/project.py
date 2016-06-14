@@ -57,10 +57,11 @@ class QuartusPopen(subprocess.Popen):
 def find_project(path=None):
     if path is None:
         path = os.curdir
+    path = os.path.abspath(path)
     while path:
         for fname in os.listdir(path):
             if fname.endswith('.qpf'):
-                return Project(os.path.abspath(path))
+                return Project(path)
         newpath = os.path.dirname(path)
         if path == newpath:
             raise RuntimeError('not in a Quartus project directory')

@@ -3,7 +3,6 @@
 
 # these might cause you problems...
 *.html
-Makefile
 
 # quartus database
 /db/
@@ -19,12 +18,8 @@ Makefile
 # built stuff
 /{project_name}.jdi
 /{project_name}.sof
+/{project_name}_time_limited.sof
 /{project_name}.pof
 /{project_name}.pin
 *.gen_qsys/
-*.gen_bsp/
 *.sopcinfo
-*.elf
-*.map
-*.objdump
-obj/

@@ -42,8 +42,8 @@ class Nios2(ProjectCommand):
     parser.add_argument('--bsp', help='bsp type (ignored when updating)', default='hal')
 
     def run(self, proj, args):
-        bspdir = os.path.join(args.output, 'bsp.gen_bsp')
-        elfname = os.path.basename(args.output) + '.elf'
+        bspdir = os.path.join(args.output, 'bsp')
+        basename = os.path.basename(args.output)
 
         if not os.path.isdir(args.output):
             os.makedirs(args.output)
@@ -54,9 +54,16 @@ class Nios2(ProjectCommand):
                 f.write('    printf("Hello, world!");\n')
                 f.write('    return 0;\n')
                 f.write('}\n')
+            with open(os.path.join(args.output, '.gitignore'), 'w') as f:
+                f.write('/bsp/\n')
+                f.write('/obj/\n')
+                f.write('/Makefile\n')
+                f.write('/' + basename + '.elf\n')
+                f.write('/' + basename + '.map\n')
+                f.write('/' + basename + '.objdump\n')
         
         proj.call(['nios2-bsp', args.bsp, bspdir, args.sopc])
-        proj.call(['nios2-app-generate-makefile', '--bsp-dir', bspdir, '--app-dir', args.output, '--elf-name', elfname, '--src-dir', args.output])
+        proj.call(['nios2-app-generate-makefile', '--bsp-dir', bspdir, '--app-dir', args.output, '--elf-name', basename + '.elf', '--src-dir', args.output])
 
 class Build(ProjectCommand):
     help = 'run the build sequence configured in .hertz'

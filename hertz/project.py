@@ -3,6 +3,7 @@ import contextlib
 import os.path
 import errno
 import pty # sorry windows
+import select
 import re
 import os
 
@@ -22,8 +23,49 @@ class QuartusPopen(subprocess.Popen):
         self.pty = os.fdopen(ours)
 
     def readlines(self):
-        try:
-            for line in self.pty:
+        # we have to be careful, self.pty will sometimes hang if you try to
+        # read it after the process dies. So we use select, to be sure we
+        # *can* read it, and os.read, to allow reading less than all bytes
+        #
+        # we have to use pty because glibc (bless 'em) always opens pipes
+        # in buffered mode, but we want unbuffered, interactive output
+        #
+        # finally, remember to call self.poll() or self.wait() to
+        # remove defunct processes.
+        #
+        # (The official Quartus IDE has some trouble with this on Linux,
+        # it tends to hang at 97% for a *long* time, and leaves the
+        # defunct.)
+        poll = select.poll()
+        poll.register(self.pty, select.POLLIN)
+        buf = b''
+        
+        while True:
+            for fd, cond in poll.poll(0.1):
+                if not cond & select.POLLIN:
+                    pass
+                try:
+                    # we can read
+                    buf += os.read(self.pty.fileno(), 512)
+                except IOError as e:
+                    if e.errno == errno.EIO:
+                        # EIO can mean EOF, here
+                        pass
+                    else:
+                        raise
+
+            # is the process done? have we read everything?
+            if self.poll() != None and not buf:
+                # it is done! finish up here
+                self.wait()
+                return
+
+            while b'\n' in buf or (buf and self.poll() != None):
+                # we found a whole line
+                line, *rest = buf.splitlines(True)
+                buf = b''.join(rest)
+                line = line.decode(errors='replace')
+            
                 line = self.ansi_re.sub('', line)
                 line = line.strip()
                 g = self.type_re.match(line)
@@ -33,26 +75,21 @@ class QuartusPopen(subprocess.Popen):
                     if num:
                         num = int(num)
                 else:
-                     typ = None
-                     num = None
-                     text = line
+                    typ = None
+                    num = None
+                    text = line
                 yield (typ, num, text)
-        except OSError as e:
-            if e.errno != errno.EIO:
-                # sometimes this means EOF
-                raise
 
     def display(self):
         for typ, num, text in self.readlines():
-            if typ == 'info':
-                continue
+            #if typ == 'info':
+            #    continue
             if typ and num:
                 print (typ + '(' + str(num) + '):', text)
             if typ:
                 print(typ + ':', text)
             else:
                 print(text)
-        self.wait()
 
 def find_project(path=None):
     if path is None:

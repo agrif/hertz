@@ -8,6 +8,9 @@
 /db/
 /incremental_db/
 
+# temporary files
+*~
+
 # reports, suppressed messages, and summaries
 *.rpt
 *.smsg
@@ -21,5 +24,7 @@
 /{project_name}_time_limited.sof
 /{project_name}.pof
 /{project_name}.pin
+/{project_name}.done
+/{project_name}.qws
 *.gen_qsys/
 *.sopcinfo

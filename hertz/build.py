@@ -31,8 +31,10 @@ class Qsys(ProjectCommand):
     def run(self, proj, args):
         output = args.output
         if not output:
-            output = os.path.splitext(args.qsys)[0] + '.gen_qsys'
+            output = os.path.splitext(args.qsys)[0]
         proj.call(['qsys-generate', args.qsys, '--synthesis=' + args.language.upper(), '--output-directory=' + output])
+        with open(os.path.join(output, '.gitignore'), 'w') as f:
+            f.write('*')
 
 class Nios2(ProjectCommand):
     help = 'generate a nios2 makefile'

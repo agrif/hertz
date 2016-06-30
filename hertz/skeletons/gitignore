@@ -26,5 +26,4 @@
 /{project_name}.pin
 /{project_name}.done
 /{project_name}.qws
-*.gen_qsys/
 *.sopcinfo

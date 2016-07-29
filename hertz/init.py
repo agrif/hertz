@@ -20,6 +20,7 @@ def skel_basic(name, family, device, base=None, exts=['.qsf', '.sdc']):
     skeletons[name] = skel
 
 skel_basic('de2-115', 'Cyclone IV E', 'EP4CE115F29C7')
+skel_basic('sockit', 'Cyclone V', '5CSXFC6D6F31C8ES')
 
 def entityfy(s):
     return s.lower().replace('-', '_')

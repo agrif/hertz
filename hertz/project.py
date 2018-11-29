@@ -183,6 +183,8 @@ class Project:
             return 'set_global_assignment -name QIP_FILE ' + relpath
         elif ext == '.sdc':
             return 'set_global_assignment -name SDC_FILE ' + relpath
+        elif ext == '.qsys':
+            return 'set_global_assignment -name QSYS_FILE ' + relpath
         else:
             raise RuntimeError('unknown source type: {}'.format(repr(ext)))
     

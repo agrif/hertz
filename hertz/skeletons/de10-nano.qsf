@@ -468,7 +468,7 @@ set_location_assignment PIN_W20 -to SW[3]
 
 # end of pin assignments
 
-set_global_assignment -name {project_name}.sdc
+set_global_assignment -name SDC_FILE {project_name}.sdc
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
